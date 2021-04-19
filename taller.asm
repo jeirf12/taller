@@ -489,6 +489,8 @@ impMsgOperandoEspHex PROC
   xor si, si
   mov si, offset dateRead
   call atoh
+  ;mov dx, offset enterhex ;para EMU
+  ;call impstr 
 RET
 ENDP
 
