@@ -52,16 +52,17 @@
         numHex2         DB ?
         numHexr1        DB ?
         numHexr2        DB ?
-        hexrnot         DB 'El resultado de NOT es: ',VAL_LF,VAL_RET,CHR_FIN
-        hexrand         DB 'El resultado de AND es: ',VAL_LF,VAL_RET,CHR_FIN     
-        hexror          DB 'El resultado de OR  es: ',VAL_LF,VAL_RET,CHR_FIN     
-        hexrxor         DB 'El resultado de ORX es: ',VAL_LF,VAL_RET,CHR_FIN     
+        hexrnot         DB VAL_LF,VAL_RET,"El resultado de NOT es: ",VAL_RET,VAL_LF,CHR_FIN
+        hexrand         DB VAL_LF,VAL_RET,"El resultado de AND es: ",VAL_RET,VAL_LF,CHR_FIN     
+        hexror          DB VAL_LF,VAL_RET,"El resultado de OR  es: ",VAL_RET,VAL_LF,CHR_FIN     
+        hexrxor         DB VAL_LF,VAL_RET,"El resultado de ORX es: ",VAL_RET,VAL_LF,CHR_FIN     
+        enterHex        DB VAL_LF,VAL_RET,CHR_FIN
 
         ;Variable de ITOA
         strItoa         DB 6 dup(?),VAL_LF,VAL_RET,CHR_FIN
 
         ;Variable de HTOA
-        strHtoa         DB 2 dup(?),VAL_LF,VAL_RET,CHR_FIN
+        strHtoa         DB 2 dup(?),' h',CHR_FIN
 
         ;Variable de HTOB
         strHtob         DB 8 dup(?),VAL_LF,VAL_RET,CHR_FIN
@@ -250,7 +251,7 @@ suma PROC
   positiveSub:
     sub ax, num2
     mov bx, ax
-    mov ah,80h 
+    mov ah, 80h 
 
   printSub:
     call itoa
@@ -309,9 +310,7 @@ ENDP
 
 ;Procedimiento de los hexadecimales a binario
 hexa PROC
-  call clear
   call colorFondo
-  call getData
 
   mov dx, offset msgNum1
   call impMsgOperandoEspHex
@@ -326,7 +325,7 @@ hexa PROC
   call htob
   mov dx, offset strHtob
   call impstr
-
+  
   ;Operacion NOT
   mov al, numHex1
   not al
@@ -341,7 +340,9 @@ hexa PROC
   call htob
   mov dx, offset strHtob
   call impstr
-
+  mov dx, offset enterHex
+  call impstr
+  
   mov al, numHex2
   not al
   mov numHexr2, al
@@ -371,7 +372,7 @@ hexa PROC
 
   ;Operacion OR
   mov al, numHex1
-  or al, numHexr2
+  or al, numHex2
   mov numHexr1, al
   mov dx, offset hexror
   call impstr
@@ -559,37 +560,37 @@ ENDP
 ; ---------------- Convertir numero a cadena ----------------
 itoa PROC    
   ;Aqui vamos a ver el estado de las banderas.
-  mov dh,ah  ;Se usa si SF esta en 1(negativo)
-  mov dl,ah  ;Se usa si desbordamiento
-  mov ax,bx
-  and dh,01h
-  cmp dh,01h
+  mov dh, ah  ;Se usa si SF esta en 1(negativo)
+  mov dl, ah  ;Se usa si desbordamiento
+  mov ax, bx
+  and dh, 01h
+  cmp dh, 01h
   jnz noOverFlow
-  mov ch,01h    
+  mov ch, 01h    
 
   noOverFlow:
-    and dl,80h
-    cmp dl,80h
+    and dl, 80h
+    cmp dl, 80h
     jnz positive
-    mov cl,01h
+    mov cl, 01h
     dec ax
     not ax
   
   positive:
-    mov si,0h
-    mov bx,0ah
+    mov si, 0h
+    mov bx, 0ah
 
   htod:
     xor dx,dx
     div bx
-    cmp ch,01h
+    cmp ch, 01h
     jnz entire
-    mov ch,0h
+    mov ch, 0h
     add dl, 6h
-    add ax,1999h
-    cmp dl,09h
+    add ax, 1999h
+    cmp dl, 0ah
     jb entire
-    sub dl,0ah
+    sub dl, 0ah
     inc ax
 
   entire:
@@ -687,7 +688,7 @@ htoa PROC
   mov bx, 02h
   mov dl, 10h
   bucleHtoa:
-    div cl
+    div dl
     cmp ah, 0ah
     jnb htoa2
     add ah, 30h
@@ -717,7 +718,7 @@ htob PROC
   bucleHtob:
     div dl
     add ah, 30h
-    mov strHtoa + bx, ah
+    mov strHtob + bx, ah
     xor ah, ah
     dec bx
     cmp bx, 0h
@@ -728,7 +729,7 @@ ENDP
 
 ;imprime cadenas
 impstr PROC
-    mov ah,09h
+    mov ah, 09h
     int 21h
 RET
 ENDP
