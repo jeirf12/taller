@@ -209,7 +209,7 @@ msgKeyExit PROC
 RET
 ENDP
 
-;imprime mensaje de presione una tecla para salir
+;procedimiento de la suma y resta
 suma PROC
   call getData
   
@@ -509,11 +509,11 @@ readCadenaInput PROC
       mov ah, 01h
       int 21h
       cmp al,0dh ;0dh es el c?digo hexadecimal del Enter, compara si el la tecla presionada fue un Enter.
-      je readEnd ;Si no fue Enter salta a la etiqueta readc
+      je readEnd ;Si no fue Enter salta a la etiqueta bucleread
       mov [bx],al
       inc bx
       jmp bucleRead
-    
+
     readEnd:
 ret
 RET
